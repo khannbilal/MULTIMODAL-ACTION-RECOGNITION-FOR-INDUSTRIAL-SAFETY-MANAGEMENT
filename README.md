@@ -1,2 +1,102 @@
-# MULTIMODAL-ACTION-RECOGNITION-FOR-INDUSTRIAL-SAFETY-MANAGEMENT
-Build a cross-attention fusion pipeline integrating 3D CNN visual features and Wav2Vec2 audio embeddings for robust industrial action recognition.
+# MULTIMODAL ACTION RECOGNITION FOR INDUSTRIAL SAFETY MANAGEMENT
+
+# Overview
+Developed a hybrid audio-visual classification framework for industrial fan and valve operation recognition. The system extracts spatiotemporal features from video frames and acoustic patterns from audio signals, then fuses these modalities using cross-attention to improve classification accuracy. The framework addresses challenges of variable clip lengths, overlapping events, and multimodal data representation.
+
+# Framework
+Models: 3D ResNet (R3D-18) for visual features, Wav2Vec2 for audio features, Cross-Attention Fusion Network
+Libraries: PyTorch, TorchVision, Torchaudio, NumPy, Pandas, SciKit-Learn
+
+# Scope
+ Extract visual features from video frames using 3D CNNs.
+ Extract audio embeddings from raw waveforms using pretrained Wav2Vec2.
+ Fuse audio-visual embeddings with cross-attention for discriminative representation.
+ Train a fully connected classifier on fused embeddings.
+ Evaluate model performance on augmented datasets with overlapping temporal segments.
+
+# Datasets Used
+ Fan-and-Valve Dataset – video and audio clips of industrial fans and valves in operation. Each clip contains synchronized audio and video sequences.
+
+# Preprocessing Steps
+ Resample audio to 16kHz and extract fixed-duration clips (5 seconds) with overlapping strides (0.25–1.25s).
+ Resize video frames to 112×112 pixels and normalize RGB channels.
+ Generate augmented clips using temporal sliding windows for both modalities.
+ Store synchronized frames and audio segments as NumPy arrays for efficient batch processing.
+
+# Methodology
+
+1. Audio and Visual Feature Extraction
+
+    Visual: 3D ResNet18 (R3D-18) pretrained on Kinetics400, identity classification head, outputs spatiotemporal embeddings.
+    Audio: Wav2Vec2 Base model outputs deep audio embeddings representing waveform characteristics.
+
+2. Cross-Modal Fusion
+
+    Project audio and visual embeddings to a shared hidden space.
+    Apply multihead cross-attention to learn inter-modal interactions.
+    Fuse attended embeddings with a feed-forward network for final clip representation.
+
+3. Classification
+
+    Fully connected classifier with 128 hidden units, ReLU activation, and dropout.
+    Softmax output for binary classification (fan vs. valve).
+    Cross-entropy loss used for supervised training with optional class weighting.
+
+4. Evaluation
+
+    Metrics: Accuracy, Precision, Recall, F1 Score.
+    Validation conducted on held-out augmented clips to assess generalization.
+    t-SNE used to visualize fused embeddings for class separability inspection.
+
+# Architecture (Textual Diagram)
+
+       ┌─────────────────────────────┐
+       │ Input Video Frames + Audio  │
+       └─────────────┬──────────────┘
+                     │
+      ┌──────────────▼───────────────┐
+      │ Visual Feature Extractor (R3D-18) │
+      └──────────────┬───────────────┘
+                     │
+      ┌──────────────▼───────────────┐
+      │ Audio Feature Extractor (Wav2Vec2) │
+      └──────────────┬───────────────┘
+                     │
+       ┌─────────────▼─────────────┐
+       │ Cross-Attention Fusion     │
+       └─────────────┬─────────────┘
+                     │
+       ┌─────────────▼─────────────┐
+       │ Fused Clip Representation │
+       └─────────────┬─────────────┘
+                     │
+       ┌─────────────▼─────────────┐
+       │ Fully Connected Classifier │
+       │ Softmax Output             │
+       └───────────────────────────┘
+
+
+# Findings
+ Current fusion improves representation but suffers from limited discriminative power.
+ Embedding normalization and class weighting could improve low precision.
+ t-SNE of fused embeddings reveals overlapping clusters for fan and valve classes.
+
+# Conclusion
+The project demonstrates a multimodal audio-visual framework for industrial equipment classification using deep learning. Cross-attention fusion captures inter-modal relationships, enabling a unified embedding for downstream classification. Performance can be enhanced with improved augmentation, normalization, and class balancing strategies.
+
+# Future Work
+ Apply embedding normalization and dimensionality reduction (PCA/LayerNorm).
+ Introduce class weighting in loss for imbalanced data.
+ Explore self-supervised pretraining for audio-visual representation.
+ Extend to multi-class classification of more industrial equipment types.
+
+# References
+1. He, K. et al. (2016). Deep Residual Learning for Image Recognition. CVPR.
+2. Baevski, A. et al. (2020). wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations. NeurIPS.
+3. Vaswani, A. et al. (2017). Attention Is All You Need. NeurIPS.
+4. PyTorch Documentation. [https://pytorch.org](https://pytorch.org)
+5. Torchaudio Documentation. [https://pytorch.org/audio](https://pytorch.org/audio)
+
+# Closest Research Paper:
+> Baevski, A., et al., “wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations,” NeurIPS 2020.
+> Provides foundation for audio embedding extraction in multimodal industrial classification tasks.
